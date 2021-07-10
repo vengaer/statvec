@@ -116,7 +116,7 @@ TEST_CASE("Removal via pop_back()", "[mutators]") {
     REQUIRE(vec.size() == 0);
 }
 
-TEST_CASE("swap()", "[mutators]") {
+TEST_CASE("Vector Swapping", "[mutators]") {
     statvec vec0{1,2,3};
     statvec vec1{4,5,6};
     std::swap(vec0, vec1);
@@ -125,9 +125,21 @@ TEST_CASE("swap()", "[mutators]") {
     }
 }
 
-TEST_CASE("clear()", "[mutators]") {
+TEST_CASE("Vector Clearing", "[mutators]") {
     statvec vec{1,2,3};
     REQUIRE(vec.size() == 3);
     vec.clear();
     REQUIRE(vec.size() == 0);
+}
+
+TEST_CASE("Vector resizing", "[mutators]") {
+    statvec<int, 128> vec{1,2,3};
+    REQUIRE(vec.size() == 3);
+    REQUIRE(vec.resize(32));
+    REQUIRE(vec.size() == 32);
+    REQUIRE(vec.resize(0));
+    REQUIRE(vec.size() == 0);
+    REQUIRE(vec.empty());
+    REQUIRE(!vec.resize(vec.capacity() + 1));
+    REQUIRE(vec.size() == vec.capacity());
 }
