@@ -212,7 +212,7 @@ class statvec {
 
         template <typename T0, typename... T1toN, typename = enable_variadic_constructor_t<remove_cvref_t<T0>>>
         constexpr statvec(T0&& first, T1toN&&... rest) noexcept(std::is_nothrow_constructible_v<T, T0&&> &&
-                                                     (std::is_nothrow_constructible_v<T, T1toN> && ...));
+                                                               (std::is_nothrow_constructible_v<T, T1toN> && ...));
         template <std::size_t M>
         constexpr statvec(std::array<T, M> const& array) noexcept(std::is_nothrow_copy_constructible_v<T>);
         template <std::size_t M>
@@ -221,11 +221,11 @@ class statvec {
         constexpr statvec(statvec const& other) noexcept(std::is_nothrow_copy_constructible_v<T>) = default;
         constexpr statvec(statvec&& other) noexcept(std::is_nothrow_move_constructible_v<T>) = default;
 
-        constexpr statvec& operator=(statvec const& other) & noexcept(std::is_nothrow_copy_constructible_v<T>);
-        constexpr statvec& operator=(statvec&& other) & noexcept(std::is_nothrow_move_constructible_v<T>);
+        constexpr statvec& operator=(statvec const& other) & noexcept(std::is_nothrow_copy_assignable_v<T>);
+        constexpr statvec& operator=(statvec&& other) & noexcept(std::is_nothrow_move_assignable_v<T>);
 
-        constexpr statvec& operator=(std::array<T, N> const& other) & noexcept(std::is_nothrow_copy_constructible_v<T>);
-        constexpr statvec& operator=(std::array<T, N>&& other) & noexcept(std::is_nothrow_move_constructible_v<T>);
+        constexpr statvec& operator=(std::array<T, N> const& other) & noexcept(std::is_nothrow_copy_assignable_v<T>);
+        constexpr statvec& operator=(std::array<T, N>&& other) & noexcept(std::is_nothrow_move_assignable_v<T>);
 
         constexpr bool assign(size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>);
         template <typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
@@ -261,17 +261,17 @@ class statvec {
         constexpr void clear() noexcept;
         constexpr bool resize(size_type size) noexcept;
 
-        constexpr iterator insert(const_iterator pos, T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>);
-        constexpr iterator insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_move_constructible_v<T>);
-        constexpr iterator insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>);
+        constexpr iterator insert(const_iterator pos, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>);
+        constexpr iterator insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_move_assignable_v<T>);
+        constexpr iterator insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>);
         template <typename It>
-        constexpr iterator insert(const_iterator pos, It first, It last) noexcept(std::is_nothrow_constructible_v<T, decltype(*first)>);
+        constexpr iterator insert(const_iterator pos, It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)>);
 
         template <typename... Ts>
         constexpr iterator emplace(const_iterator pos, Ts&&... args) noexcept(std::is_nothrow_constructible_v<T, Ts&&...>);
 
-        constexpr bool push_back(T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>);
-        constexpr bool push_back(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>);
+        constexpr bool push_back(T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>);
+        constexpr bool push_back(T&& value) noexcept(std::is_nothrow_move_assignable_v<T>);
 
         template <typename... Ts>
         constexpr bool emplace_back(Ts&&... args) noexcept(std::is_nothrow_constructible_v<T, Ts&&...>);
@@ -334,7 +334,7 @@ statvec(std::array<T, N>&&) -> statvec<T, N>;
 template <typename T, std::size_t N>
 template <typename T0, typename... T1toN, typename>
 constexpr statvec<T, N>::statvec(T0&& first, T1toN&&... rest) noexcept(std::is_nothrow_constructible_v<T, T0&&> &&
-                                                            (std::is_nothrow_constructible_v<T, T1toN> && ...))
+                                                                      (std::is_nothrow_constructible_v<T, T1toN> && ...))
     : buf_{construct(std::index_sequence_for<T0, T1toN...>{}, std::forward<T0>(first), std::forward<T1toN>(rest)...)},
       size_{sizeof...(rest) + 1u}
 {
@@ -360,28 +360,28 @@ constexpr statvec<T, N>::statvec(std::array<T, M>&& array) noexcept(std::is_noth
 }
 
 template <typename T, std::size_t N>
-constexpr statvec<T, N>& statvec<T, N>::operator=(statvec const& other) & noexcept(std::is_nothrow_copy_constructible_v<T>) {
+constexpr statvec<T, N>& statvec<T, N>::operator=(statvec const& other) & noexcept(std::is_nothrow_copy_assignable_v<T>) {
     std::copy(std::begin(other), std::end(other), std::begin(*this));
     size_ = other.size_;
     return *this;
 }
 
 template <typename T, std::size_t N>
-constexpr statvec<T, N>& statvec<T, N>::operator=(statvec&& other) & noexcept(std::is_nothrow_move_constructible_v<T>) {
+constexpr statvec<T, N>& statvec<T, N>::operator=(statvec&& other) & noexcept(std::is_nothrow_move_assignable_v<T>) {
     std::move(std::begin(other), std::end(other), std::begin(*this));
     size_ = other.size_;
     return *this;
 }
 
 template <typename T, std::size_t N>
-constexpr statvec<T, N>& statvec<T,N>::operator=(std::array<T, N> const& other) & noexcept(std::is_nothrow_copy_constructible_v<T>) {
+constexpr statvec<T, N>& statvec<T,N>::operator=(std::array<T, N> const& other) & noexcept(std::is_nothrow_copy_assignable_v<T>) {
     std::copy(std::begin(other), std::end(other), std::begin(*this));
     size_ = other.size();
     return *this;
 }
 
 template <typename T, std::size_t N>
-constexpr statvec<T, N>& statvec<T, N>::operator=(std::array<T, N>&& other) & noexcept(std::is_nothrow_move_constructible_v<T>) {
+constexpr statvec<T, N>& statvec<T, N>::operator=(std::array<T, N>&& other) & noexcept(std::is_nothrow_move_assignable_v<T>) {
     std::move(std::begin(other), std::end(other), std::begin(*this));
     size_ = other.size();
     return *this;
@@ -541,7 +541,7 @@ constexpr bool statvec<T, N>::resize(size_type size) noexcept {
 
 template <typename T, std::size_t N>
 constexpr typename statvec<T, N>::iterator
-statvec<T, N>::insert(const_iterator pos, T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>) {
+statvec<T, N>::insert(const_iterator pos, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>) {
     if(size() == capacity()) {
         return end();
     }
@@ -554,7 +554,7 @@ statvec<T, N>::insert(const_iterator pos, T const& value) noexcept(std::is_nothr
 
 template <typename T, std::size_t N>
 constexpr typename statvec<T, N>::iterator
-statvec<T, N>::insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_move_constructible_v<T>) {
+statvec<T, N>::insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_move_assignable_v<T>) {
     if(size() == capacity()) {
         return end();
     }
@@ -567,7 +567,7 @@ statvec<T, N>::insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_mo
 
 template <typename T, std::size_t N>
 constexpr typename statvec<T, N>::iterator
-statvec<T, N>::insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>) {
+statvec<T, N>::insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>) {
     if(size() + count > capacity()) {
         return end();
     }
@@ -583,7 +583,7 @@ statvec<T, N>::insert(const_iterator pos, size_type count, T const& value) noexc
 template <typename T, std::size_t N>
 template <typename It>
 constexpr typename statvec<T, N>::iterator
-statvec<T, N>::insert(const_iterator pos, It first, It last) noexcept(std::is_nothrow_constructible_v<T, decltype(*first)>) {
+statvec<T, N>::insert(const_iterator pos, It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)>) {
     auto diff = std::distance(first, last);
 
     if(size() + diff > capacity()) {
@@ -614,7 +614,7 @@ statvec<T, N>::emplace(const_iterator pos, Ts&&... args) noexcept(std::is_nothro
 }
 
 template <typename T, std::size_t N>
-constexpr bool statvec<T, N>::push_back(T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>) {
+constexpr bool statvec<T, N>::push_back(T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>) {
     if(size() == capacity()) {
         return false;
     }
@@ -623,7 +623,7 @@ constexpr bool statvec<T, N>::push_back(T const& value) noexcept(std::is_nothrow
 }
 
 template <typename T, std::size_t N>
-constexpr bool statvec<T, N>::push_back(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>) {
+constexpr bool statvec<T, N>::push_back(T&& value) noexcept(std::is_nothrow_move_assignable_v<T>) {
     if(size() == capacity()) {
         return false;
     }
