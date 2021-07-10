@@ -238,9 +238,9 @@ class statvec {
         constexpr void swap(statvec& other) noexcept(noexcept(std::swap(std::declval<T&>(), std::declval<T&>())));
 
         template <std::size_t M>
-        [[nodiscard]] constexpr statvec<T, M> resize() const & noexcept(std::is_nothrow_copy_constructible_v<T>);
+        [[nodiscard]] constexpr statvec<T, M> reserve() const & noexcept(std::is_nothrow_copy_constructible_v<T>);
         template <std::size_t M>
-        [[nodiscard]] constexpr statvec<T, M> resize() && noexcept(std::is_nothrow_move_constructible_v<T>);
+        [[nodiscard]] constexpr statvec<T, M> reserve() && noexcept(std::is_nothrow_move_constructible_v<T>);
 
         constexpr void clear() noexcept;
 
@@ -444,7 +444,7 @@ constexpr void statvec<T, N>::swap(statvec& other) noexcept(noexcept(std::swap(s
 
 template <typename T, std::size_t N>
 template <std::size_t M>
-[[nodiscard]] constexpr statvec<T, M> statvec<T, N>::resize() const & noexcept(std::is_nothrow_copy_constructible_v<T>) {
+[[nodiscard]] constexpr statvec<T, M> statvec<T, N>::reserve() const & noexcept(std::is_nothrow_copy_constructible_v<T>) {
     if constexpr(M > N) {
         return statvec<T, M>{forward_array<M>(buf_, std::make_index_sequence<N>{})};
     }
@@ -455,7 +455,7 @@ template <std::size_t M>
 
 template <typename T, std::size_t N>
 template <std::size_t M>
-[[nodiscard]] constexpr statvec<T, M> statvec<T, N>::resize() && noexcept(std::is_nothrow_move_constructible_v<T>) {
+[[nodiscard]] constexpr statvec<T, M> statvec<T, N>::reserve() && noexcept(std::is_nothrow_move_constructible_v<T>) {
     if constexpr(M > N) {
         return statvec<T, M>{forward_array<M>(std::move(buf_), std::make_index_sequence<N>{})};
     }
@@ -610,8 +610,8 @@ constexpr bool operator>(statvec<T, N> const& lhs, statvec<T, M> const& rhs) noe
 }
 
 template <std::size_t M, typename Vec>
-[[nodiscard]] constexpr auto statvec_resize(Vec&& vec) noexcept(noexcept(std::forward<Vec>(vec).template resize<M>())) {
-    return std::forward<Vec>(vec).template resize<M>();
+[[nodiscard]] constexpr auto statvec_reserve(Vec&& vec) noexcept(noexcept(std::forward<Vec>(vec).template reserve<M>())) {
+    return std::forward<Vec>(vec).template reserve<M>();
 }
 
 namespace detail {
