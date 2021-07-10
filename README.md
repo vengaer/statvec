@@ -5,9 +5,6 @@ A stack-allocated, statically sized `constexpr` vector in the vein of `std::vect
 * assign
 * get_allocator
 * shrink_to_fit
-* insert
-* emplace
-* erase
 
 ## Catch
 
