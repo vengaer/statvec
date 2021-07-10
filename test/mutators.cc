@@ -124,3 +124,10 @@ TEST_CASE("swap()", "[mutators]") {
         REQUIRE(vec1[i] == vec0[i] - 3);
     }
 }
+
+TEST_CASE("clear()", "[mutators]") {
+    statvec vec{1,2,3};
+    REQUIRE(vec.size() == 3);
+    vec.clear();
+    REQUIRE(vec.size() == 0);
+}
