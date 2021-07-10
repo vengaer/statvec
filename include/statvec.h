@@ -242,6 +242,8 @@ class statvec {
         template <std::size_t M>
         [[nodiscard]] constexpr statvec<T, M> resize() && noexcept(std::is_nothrow_move_constructible_v<T>);
 
+        constexpr void clear() noexcept;
+
         constexpr bool push_back(T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>);
         constexpr bool push_back(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>);
 
@@ -460,6 +462,11 @@ template <std::size_t M>
     else {
         return statvec<T, M>{forward_array<M>(std::move(buf_), std::make_index_sequence<M>{})};
     }
+}
+
+template <typename T, std::size_t N>
+constexpr void statvec<T, N>::clear() noexcept {
+    size_ = 0u;
 }
 
 template <typename T, std::size_t N>
