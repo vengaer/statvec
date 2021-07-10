@@ -243,6 +243,7 @@ class statvec {
         [[nodiscard]] constexpr statvec<T, M> reserve() && noexcept(std::is_nothrow_move_constructible_v<T>);
 
         constexpr void clear() noexcept;
+        constexpr bool resize(size_type size) noexcept;
 
         constexpr bool push_back(T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>);
         constexpr bool push_back(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>);
@@ -467,6 +468,16 @@ template <std::size_t M>
 template <typename T, std::size_t N>
 constexpr void statvec<T, N>::clear() noexcept {
     size_ = 0u;
+}
+
+template <typename T, std::size_t N>
+constexpr bool statvec<T, N>::resize(size_type size) noexcept {
+    if(size > capacity()) {
+        size_ = capacity();
+        return false;
+    }
+    size_ = size;
+    return true;
 }
 
 template <typename T, std::size_t N>
