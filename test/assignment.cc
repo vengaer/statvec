@@ -183,3 +183,22 @@ TEST_CASE("Array Move Assignment", "[assignment]") {
         }
     }
 }
+
+TEST_CASE("Assign Count", "[assignment]") {
+    statvec vec{1, 2, 3, 4, 5, 6, 7, 8};
+    REQUIRE(vec.size() == 8);
+    REQUIRE(vec.assign(4, 12));
+    REQUIRE(vec.size() == 4);
+    REQUIRE(vec == statvec{12, 12, 12, 12});
+    REQUIRE(!vec.assign(32, 0));
+    REQUIRE(vec == statvec{0, 0, 0, 0, 0, 0, 0, 0});
+}
+
+TEST_CASE("Assign Range", "[assignment]") {
+    std::array arr{12, 12, 12, 12, 12, 12, 12};
+    statvec vec{1, 2, 3, 4, 5, 6};
+    REQUIRE(vec.assign(arr.begin(), arr.end() - 1));
+    REQUIRE(vec == statvec{12, 12, 12, 12, 12, 12});
+    REQUIRE(vec.size() == 6);
+    REQUIRE(!vec.assign(arr.begin(), arr.end()));
+}
