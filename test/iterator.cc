@@ -38,6 +38,7 @@ inline bool constexpr is_const_iterator_v = is_const_iterator<T>::value;
 
 TEMPLATE_TEST_CASE("Iterator Default Construction", "[iterator]", iter_type, citer_type, riter_type, criter_type) {
     TestType it;
+    (void)it;
 }
 
 TEMPLATE_TEST_CASE("Iterator Copy Construction", "[iterator]", iter_type, citer_type, riter_type, criter_type) {
