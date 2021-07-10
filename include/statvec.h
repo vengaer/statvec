@@ -171,6 +171,16 @@ inline bool constexpr is_statvec_v = is_statvec<T>::value;
 template <typename T, typename U = void>
 using enable_variadic_constructor_t = std::enable_if_t<!is_std_array_v<T> && !is_statvec_v<T>, U>;
 
+template <typename, typename = void>
+struct is_input_iterator : std::false_type { };
+
+template <typename T>
+struct is_input_iterator<T, std::void_t<decltype(++std::declval<T&>()), decltype(*std::declval<T&>()),
+                                        decltype(std::declval<T&>() == std::declval<T&>())>> : std::true_type { };
+
+template <typename T>
+inline bool constexpr is_input_iterator_v = is_input_iterator<T>::value;
+
 } // namespace detail
 
 template <typename T, std::size_t N>
@@ -182,6 +192,8 @@ class statvec {
     using remove_cvref_t = detail::remove_cvref_t<U>;
     template <typename U>
     using enable_variadic_constructor_t = detail::enable_variadic_constructor_t<U>;
+    template <typename U>
+    static bool constexpr is_input_iterator_v = detail::is_input_iterator_v<U>;
 
     public:
         using value_type             = typename std::array<T, N>::value_type;
@@ -214,6 +226,10 @@ class statvec {
 
         constexpr statvec& operator=(std::array<T, N> const& other) & noexcept(std::is_nothrow_copy_constructible_v<T>);
         constexpr statvec& operator=(std::array<T, N>&& other) & noexcept(std::is_nothrow_move_constructible_v<T>);
+
+        constexpr bool assign(size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>);
+        template <typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
+        constexpr bool assign(It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)>);
 
         constexpr reference operator[](std::size_t i) noexcept;
         constexpr const_reference operator[](std::size_t i) const noexcept;
@@ -298,7 +314,7 @@ class statvec {
 
     private:
         std::array<T, N> buf_;
-        std::size_t size_{};
+        size_type size_{};
 
         template < typename... Ts, std::size_t... Is>
         static constexpr std::array<T, N> construct(std::index_sequence<Is...>, Ts&&... args) noexcept((std::is_nothrow_constructible_v<T, Ts&&> && ...));
@@ -369,6 +385,37 @@ constexpr statvec<T, N>& statvec<T, N>::operator=(std::array<T, N>&& other) & no
     std::move(std::begin(other), std::end(other), std::begin(*this));
     size_ = other.size();
     return *this;
+}
+
+template <typename T, std::size_t N>
+constexpr bool statvec<T, N>::assign(size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>) {
+    if(count > capacity()) {
+        for(size_ = 0u;  size_ < capacity(); ++size_) {
+            buf_[size_] = value;
+        }
+        return false;
+    }
+    for(size_ = 0u; size_ < count; ++size_) {
+        buf_[size_] = value;
+    }
+    return true;
+}
+
+template <typename T, std::size_t N>
+template <typename It, typename>
+constexpr bool statvec<T, N>::assign(It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)>) {
+    auto diff = std::distance(first, last);
+    if(diff > (decltype(diff))capacity()) {
+        for(size_ = 0; size_ < capacity(); size_++) {
+            buf_[size_] = *first++;
+        }
+        return false;
+    }
+    auto it = begin();
+    while(first != last) {
+        *it++ = *first++;
+    }
+    return true;
 }
 
 template <typename T, std::size_t N>
