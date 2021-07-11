@@ -191,7 +191,7 @@ TEST_CASE("Vector Insertion Count", "[mutators]") {
     SECTION("Simple Insertion") {
         std::array arr{12, 12, 12, 12};
         statvec<int, 128> vec{1, 2, 3};
-        REQUIRE(vec.insert(vec.begin() + 1, arr.begin(), arr.end())[0] == 12);
+        REQUIRE(vec.insert(vec.begin() + 1, arr.begin(), arr.end())[-1] == 1);
         REQUIRE(vec[0] == 1);
         REQUIRE(vec[1] == 12);
         REQUIRE(vec[2] == 12);
