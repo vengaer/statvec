@@ -661,7 +661,7 @@ statvec<T, N>::erase(const_iterator first, const_iterator last) noexcept(std::is
     auto dst = begin() + std::distance(cbegin(), first);
     auto src = begin() + std::distance(cbegin(), last);
     std::move(src, end(), dst);
-    size_ -= (last - first);
+    size_ -= std::distance(first, last);
     return dst;
 }
 
