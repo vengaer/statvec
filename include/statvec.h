@@ -181,6 +181,9 @@ struct is_input_iterator<T, std::void_t<decltype(++std::declval<T&>()), decltype
 template <typename T>
 inline bool constexpr is_input_iterator_v = is_input_iterator<T>::value;
 
+template <typename T, typename U = void>
+using enable_if_input_iterator_t = std::enable_if_t<is_input_iterator_v<T>, U>;
+
 } // namespace detail
 
 template <typename T, std::size_t N>
@@ -193,7 +196,7 @@ class statvec {
     template <typename U>
     using enable_variadic_constructor_t = detail::enable_variadic_constructor_t<U>;
     template <typename U>
-    static bool constexpr is_input_iterator_v = detail::is_input_iterator_v<U>;
+    using enable_if_input_iterator_t = detail::enable_if_input_iterator_t<U>;
 
     public:
         using value_type             = typename std::array<T, N>::value_type;
@@ -232,7 +235,7 @@ class statvec {
         constexpr statvec& operator=(std::array<T, N>&& other) & noexcept(std::is_nothrow_move_assignable_v<T>);
 
         constexpr bool assign(size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T>);
-        template <typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
+        template <typename It, typename = enable_if_input_iterator_t<remove_cvref_t<It>>>
         constexpr bool assign(It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)>);
 
         constexpr reference operator[](size_type i) noexcept;
@@ -269,7 +272,7 @@ class statvec {
                                                                                std::is_nothrow_move_assignable_v<T>);
         constexpr iterator insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_move_assignable_v<T>);
         constexpr iterator insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_assignable_v<T>);
-        template <typename It>
+        template <typename It, typename = enable_if_input_iterator_t<remove_cvref_t<It>>>
         constexpr iterator insert(const_iterator pos, It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)> &&
                                                                                   std::is_nothrow_move_assignable_v<T>);
 
@@ -594,7 +597,7 @@ statvec<T, N>::insert(const_iterator pos, size_type count, T const& value) noexc
 }
 
 template <typename T, std::size_t N>
-template <typename It>
+template <typename It, typename>
 constexpr typename statvec<T, N>::iterator
 statvec<T, N>::insert(const_iterator pos, It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)> &&
                                                                       std::is_nothrow_move_assignable_v<T>) {
