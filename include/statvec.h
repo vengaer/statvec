@@ -271,7 +271,8 @@ class statvec {
         constexpr iterator insert(const_iterator pos, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T> &&
                                                                                std::is_nothrow_move_assignable_v<T>);
         constexpr iterator insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_move_assignable_v<T>);
-        constexpr iterator insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_assignable_v<T>);
+        constexpr iterator insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T> &&
+                                                                                                std::is_nothrow_move_assignable_v<T>);
         template <typename It, typename = enable_if_input_iterator_t<remove_cvref_t<It>>>
         constexpr iterator insert(const_iterator pos, It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)> &&
                                                                                   std::is_nothrow_move_assignable_v<T>);
@@ -583,7 +584,9 @@ statvec<T, N>::insert(const_iterator pos, T&& value) noexcept(std::is_nothrow_mo
 
 template <typename T, std::size_t N>
 constexpr typename statvec<T, N>::iterator
-statvec<T, N>::insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_assignable_v<T>) {
+statvec<T, N>::insert(const_iterator pos, size_type count, T const& value) noexcept(std::is_nothrow_copy_assignable_v<T> &&
+                                                                                    std::is_nothrow_move_assignable_v<T>)
+{
     if(size() + count > capacity()) {
         return end();
     }
