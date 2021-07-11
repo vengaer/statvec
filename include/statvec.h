@@ -665,7 +665,7 @@ constexpr bool statvec<T, N>::emplace_back(Ts&&... args) noexcept(std::is_nothro
 
 template <typename T, std::size_t N>
 constexpr T statvec<T, N>::pop_back() noexcept(std::is_nothrow_copy_constructible_v<T>) {
-    return buf_[size_-- - 1u];
+    return buf_[--size_];
 }
 
 template <typename T, std::size_t N>
