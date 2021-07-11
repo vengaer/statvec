@@ -9,6 +9,7 @@
 
 TEST_CASE("Default Construction", "[construction]") {
     statvec<int, 3> vec;
+    (void)vec;
 }
 
 TEST_CASE("Zero Construction", "[construction]") {
