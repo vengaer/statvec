@@ -231,11 +231,11 @@ class statvec {
         template <typename It, typename = std::enable_if_t<is_input_iterator_v<It>>>
         constexpr bool assign(It first, It last) noexcept(std::is_nothrow_assignable_v<T, decltype(*first)>);
 
-        constexpr reference operator[](std::size_t i) noexcept;
-        constexpr const_reference operator[](std::size_t i) const noexcept;
+        constexpr reference operator[](size_type i) noexcept;
+        constexpr const_reference operator[](size_type i) const noexcept;
 
-        constexpr reference at(std::size_t i);
-        constexpr const_reference at(std::size_t i) const;
+        constexpr reference at(size_type i);
+        constexpr const_reference at(size_type i) const;
 
         constexpr reference front() noexcept;
         constexpr const_reference front() const noexcept;
@@ -419,17 +419,17 @@ constexpr bool statvec<T, N>::assign(It first, It last) noexcept(std::is_nothrow
 }
 
 template <typename T, std::size_t N>
-constexpr typename statvec<T, N>::reference statvec<T, N>::operator[](std::size_t i) noexcept {
+constexpr typename statvec<T, N>::reference statvec<T, N>::operator[](size_type i) noexcept {
     return buf_[i];
 }
 
 template <typename T, std::size_t N>
-constexpr typename statvec<T, N>::const_reference statvec<T, N>::operator[](std::size_t i) const noexcept {
+constexpr typename statvec<T, N>::const_reference statvec<T, N>::operator[](size_type i) const noexcept {
     return buf_[i];
 }
 
 template <typename T, std::size_t N>
-constexpr typename statvec<T, N>::reference statvec<T, N>::at(std::size_t i) {
+constexpr typename statvec<T, N>::reference statvec<T, N>::at(size_type i) {
     using namespace std::string_literals;
     if(i >= size()) {
         throw std::out_of_range("Cannot access element at index"s + std::to_string(i));
@@ -438,7 +438,7 @@ constexpr typename statvec<T, N>::reference statvec<T, N>::at(std::size_t i) {
 }
 
 template <typename T, std::size_t N>
-constexpr typename statvec<T, N>::const_reference statvec<T, N>::at(std::size_t i) const {
+constexpr typename statvec<T, N>::const_reference statvec<T, N>::at(size_type i) const {
     using namespace std::string_literals;
     if(i >= size()) {
         throw std::out_of_range("Cannot access element at index"s + std::to_string(i));
